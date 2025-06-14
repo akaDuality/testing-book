@@ -20,7 +20,7 @@ env:
   LANGUAGE: "en_US.UTF-8"
   LC_ALL: "en_US.UTF-8"
   SCHEME: "AboutTesting"
-  SCHEME_LOWERCASED: "abouttesting"
+  SCHEME_LOWERCASED: "book"
   XCODE_VERSION: '~>16.4'
   DERIVED_DATA_PATH: './DerivedData/'
   DESTINATION: 'generic/platform=iOS'
@@ -49,10 +49,9 @@ jobs:
           
       - name: Make Static Site
         run: >
-          $(xcrun --find docc) process-archive
-          transform-for-static-hosting ${{ env.DERIVED_DATA_PATH }}Build/Products/Debug-iphoneos/${{ env.SCHEME }}.doccarchive
-          --output-path ${{ env.ARTEFACT_PATH }}
-          --hosting-base-path ${{ env.REPOSITORY_NAME }}
+          swift package --allow-writing-to-directory ./docs \
+            generate-documentation --target Book --output-path ./docs \
+            --transform-for-static-hosting --hosting-base-path ${{ steps.deployment.outputs.page_url }}
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -10,6 +10,9 @@ let package = Package(
             "Book"
         ])
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.4"),
+    ],
     targets: [
         .target(name: "Book"),
     ]
