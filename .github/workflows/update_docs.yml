@@ -17,7 +17,7 @@ concurrency:
 
 env:
   SCHEME: "Book"
-  DERIVED_DATA_PATH: './DerivedData/'
+  DERIVED_DATA_PATH: './docs/'
   DESTINATION: 'platform=iOS Simulator,name=iPhone 15'
   REPOSITORY_NAME: 'AboutTesting'
 
@@ -41,7 +41,7 @@ jobs:
 
       - name: Add redirect index.html
         run: |
-          cat > docs/index.html <<EOF
+          cat > ${{ DERIVED_DATA_PATH }}/index.html <<EOF
           <!DOCTYPE html>
           <html>
             <head>
