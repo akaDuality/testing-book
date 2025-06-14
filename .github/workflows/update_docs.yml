@@ -39,6 +39,20 @@ jobs:
         run: |
           swift package --allow-writing-to-directory ${{ env.DERIVED_DATA_PATH }} generate-documentation --target ${{ env.SCHEME }} --disable-indexing --transform-for-static-hosting --hosting-base-path '${{ env.REPOSITORY_NAME }}' --output-path ${{ env.DERIVED_DATA_PATH }}
 
+      - name: Add redirect index.html
+        run: |
+          cat > docs/index.html <<EOF
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta http-equiv="refresh" content="0; url=./documentation/book/">
+            </head>
+            <body>
+              <p>Redirecting to <a href="./documentation/book/">documentation</a>...</p>
+            </body>
+          </html>
+          EOF
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
