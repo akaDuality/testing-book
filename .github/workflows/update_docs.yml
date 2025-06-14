@@ -19,7 +19,7 @@ env:
   SCHEME: "Book"
   DERIVED_DATA_PATH: './DerivedData/'
   DESTINATION: 'platform=iOS Simulator,name=iPhone 15'
-  HOSTING_BASE_PATH: 'AboutTesting'
+  HOSTING_BASE_PATH: 'rubanov.dev'
 
 jobs:
   update-docs:
