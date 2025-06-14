@@ -50,11 +50,6 @@ jobs:
             --output-path ${{ env.ARTEFACT_PATH }} \
             --transform-for-static-hosting \
             --hosting-base-path "Book"
-          
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ${{ env.ARTEFACT_PATH }}
 
   deploy:
     needs: update-docs
