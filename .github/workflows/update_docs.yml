@@ -2,9 +2,8 @@ name: Update Documentation
 
 on:
   push:
-    tags:
-      - "*.*.*"
-
+    branches: ["main"]
+    
   workflow_dispatch:
 
 permissions:
