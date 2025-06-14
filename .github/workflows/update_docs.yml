@@ -44,9 +44,9 @@ jobs:
       - name: Make Static Site
         run: >
           swift package \
-            --allow-writing-to-directory ${{ ARTEFACT_PATH }} \
+            --allow-writing-to-directory ${{ env.ARTEFACT_PATH }} \
             generate-documentation --target Book \
-            --output-path ${{ ARTEFACT_PATH }} \
+            --output-path ${{ env.ARTEFACT_PATH }} \
             --transform-for-static-hosting \
             --hosting-base-path "rubanov.dev"
           
