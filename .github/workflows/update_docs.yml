@@ -46,9 +46,10 @@ jobs:
           swift package \
             --allow-writing-to-directory ${{ env.ARTEFACT_PATH }} \
             generate-documentation --target Book \
+            --disable-indexing \
             --output-path ${{ env.ARTEFACT_PATH }} \
             --transform-for-static-hosting \
-            --hosting-base-path "rubanov.dev"
+            --hosting-base-path "Book"
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -64,6 +65,11 @@ jobs:
       
     runs-on: 'macos-15'
     steps:
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.ARTEFACT_PATH }}
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
