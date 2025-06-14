@@ -19,7 +19,7 @@ env:
   SCHEME: "Book"
   DERIVED_DATA_PATH: './DerivedData/'
   DESTINATION: 'platform=iOS Simulator,name=iPhone 15'
-  HOSTING_BASE_PATH: 'Book'
+  HOSTING_BASE_PATH: 'AboutTesting'
 
 jobs:
   update-docs:
@@ -28,7 +28,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1
         with:
            xcode-version: latest
-      
+
       - name: Checkout
         uses: actions/checkout@v4
         
