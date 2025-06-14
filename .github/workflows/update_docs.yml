@@ -40,12 +40,12 @@ jobs:
         
       - name: Build
         run: |
-          swift package --allow-writing-to-directory ${{ env.DOCS_PATH }} generate-documentation --target ${{ env.TARGET }} --disable-indexing --transform-for-static-hosting --hosting-base-path '${{ env.HOSTING_BASE_PATH }}' --output-path ${{ env.SITE_PATH }}
+          swift package --allow-writing-to-directory ${{ env.DOCS_PATH }} generate-documentation --target ${{ env.TARGET }} --disable-indexing --transform-for-static-hosting --hosting-base-path '${{ env.HOSTING_BASE_PATH }}'
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.SITE_PATH }}
+          path: ${{ env.DOCS_PATH }}
 
       - name: Deploy to GitHub Pages
         id: deployment
