@@ -41,17 +41,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v2
         
-      - name: Compile
-        run: >
-          xcodebuild docbuild -scheme ${{ env.SCHEME }}
-          -destination 'generic/platform=iOS'
-          -derivedDataPath ${{ env.DERIVED_DATA_PATH }}
-          
       - name: Make Static Site
         run: >
           swift package --allow-writing-to-directory ./docs \
             generate-documentation --target Book --output-path ./docs \
-            --transform-for-static-hosting --hosting-base-path ${{ steps.deployment.outputs.page_url }}
+            --transform-for-static-hosting --hosting-base-path "rubanov.dev"
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
