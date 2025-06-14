@@ -2,7 +2,8 @@ name: Update Documentation
 
 on:
   push:
-    branches: ["main"]
+    tags:
+      - "*.*.*"
 
   workflow_dispatch:
 
@@ -16,22 +17,15 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LANG: "en_US.UTF-8"
-  LANGUAGE: "en_US.UTF-8"
-  LC_ALL: "en_US.UTF-8"
-  TARGET: "Book"
-  DOCS_PATH: './docs'
-  SITE_PATH: './site'
+  SCHEME: "Book"
+  DERIVED_DATA_PATH: './DerivedData/'
+  DESTINATION: 'platform=iOS Simulator,name=iPhone 15'
   HOSTING_BASE_PATH: 'Book'
 
 jobs:
   update-docs:
-    runs-on: 'macos-15'
+    runs-on: macos-15
     steps:
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-           xcode-version: latest
-
       - name: Checkout
         uses: actions/checkout@v4
         
@@ -40,13 +34,14 @@ jobs:
         
       - name: Build
         run: |
-          swift package --allow-writing-to-directory ${{ env.DOCS_PATH }} generate-documentation --target ${{ env.TARGET }} --disable-indexing --transform-for-static-hosting --hosting-base-path '${{ env.HOSTING_BASE_PATH }}'
+          swift package --allow-writing-to-directory ${{ env.DERIVED_DATA_PATH }} generate-documentation --target ${{ env.SCHEME }} --disable-indexing --transform-for-static-hosting --hosting-base-path '${{ env.HOSTING_BASE_PATH }}' --output-path ${{ env.DERIVED_DATA_PATH }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ env.DOCS_PATH }}
+          path: ${{ env.DERIVED_DATA_PATH }}
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      
