@@ -41,7 +41,7 @@ jobs:
 
       - name: Add redirect index.html
         run: |
-          cat > ${{ DERIVED_DATA_PATH }}/index.html <<EOF
+          cat > ${{ env.DERIVED_DATA_PATH }}/index.html <<EOF
           <!DOCTYPE html>
           <html>
             <head>
