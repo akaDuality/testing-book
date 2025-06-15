@@ -5,12 +5,33 @@
 <!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
     }
     
+    @Chapter(name: "Простые тесты") {
+        1. TDD-каты
+        
+        @Image(source: SimpleTesting, alt: "Хмурый мужчина радуется после того как прошли тесты")        
+        @TutorialReference(tutorial: "doc:tutorials/Network")
+    }
+    
     @Chapter(name: "Зависимости") {
         Самая сложная задача тестирования — получить контроль над всеми зависимостями. 
         
         Сначала прочитайте статью <doc:Dependencies>
-<!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
+        1. <doc:Dependencies>
+        1. <doc:Network> 
+        1. <doc:PreviewPrefire>
+        1. Вьюмодель как конечное представление. Тестирование состояния через spy. 
+        1. <doc:Navigation>
+
+        @Image(source: Dependencies, alt: "Хмурый мужчина не может запустить тесты из-за сложных зависимостей")   
         
         @TutorialReference(tutorial: "doc:tutorials/Network")
+    }
+    
+    @Chapter(name: "TDD в реальном приложении") {
+       1. Превью, вьюшка, стабы, скриншот-тест
+       1. Пишем с реальной сетью, отделяем зависимости, стабаем. 
+       
+       @Image(source: TDD-cycle, alt: "Хмурый мужчина не может запустить тесты из-за сложных зависимостей")   
+       @TutorialReference(tutorial: "doc:tutorials/Network")
     }
 }
