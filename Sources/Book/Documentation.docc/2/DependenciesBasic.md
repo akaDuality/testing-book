@@ -99,6 +99,5 @@ struct FeatureTests {
     }
 }
 ```
-Примеры показываю самые навороченные, потому что тема большая, сами разберетесь, если захотите.
 
 [Библиотека Dependencies](https://github.com/pointfreeco/swift-dependencies)
