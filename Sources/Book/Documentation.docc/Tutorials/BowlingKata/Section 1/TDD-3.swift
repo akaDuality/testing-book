@@ -6,7 +6,7 @@ class GameTests {
     func initialScore() {
         let sut = Game()
         
-        sut.expectScore(0)
+        #expect(sut.score == 0)
     }
     
     @Test
@@ -15,7 +15,7 @@ class GameTests {
         
         sut.roll(1) // Act
         
-        sut.expectScore(1) // Assert
+        #expect(sut.score == 1) // Assert
     }
     
     @Test
@@ -25,24 +25,14 @@ class GameTests {
         sut.roll(1)
         sut.roll(1)
         
-        sut.expectScore(2)
-    }
-}
-
-extension Game {
-    func expectScore(
-        _ expectedScore: Int
-    ) {
-        #expect(self.score == expectedScore)
+        #expect(sut.score == 2)
     }
 }
 
 class Game {
-    var score = 0
+    private(set) var score = 0  
     
     func roll(_ pins: Int) {
         score += pins
     }
 }
-
-

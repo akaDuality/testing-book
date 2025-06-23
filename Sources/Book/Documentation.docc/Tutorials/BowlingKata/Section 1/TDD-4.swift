@@ -31,19 +31,16 @@ class GameTests {
 
 extension Game {
     func expectScore(
-        _ expectedScore: Int,
-        sourceLocation: SourceLocation = #_sourceLocation
+        _ expectedScore: Int
     ) {
-        #expect(self.score == expectedScore, sourceLocation: sourceLocation)
+        #expect(self.score == expectedScore)
     }
 }
 
 class Game {
-    var score = 0
+    private(set) var score = 0  
     
     func roll(_ pins: Int) {
         score += pins
     }
 }
-
-
