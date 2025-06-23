@@ -6,7 +6,9 @@
     }
     
     @Chapter(name: "Простые тесты") {
-        1. TDD-каты
+        1. <doc:2-1-TDD-Kata>
+        
+        @TutorialReference(tutorial: "doc:tutorials/BowlingKata")
         
         @Image(source: SimpleTesting, alt: "Хмурый мужчина радуется после того как прошли тесты")        
         @TutorialReference(tutorial: "doc:tutorials/Network")
