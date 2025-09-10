@@ -7,12 +7,12 @@ class APIStub {
     @discardableResult
     public func success<T: ResponseDTO>(
         _ request: Request<T>, _ response: T,
-        removeAfterExecution: Bool = false
+        numberOfCalls: Int = 1
     ) -> Self {
         let descriptor = RequestDescriptor(
             url: request.url!,
             result: .success(response),
-            removeAfterExecution: removeAfterExecution)
+            numberOfCalls: numberOfCalls)
         
         jsonResponses.append(descriptor)
         return self
@@ -21,12 +21,12 @@ class APIStub {
     @discardableResult
     public func fail<T: ResponseDTO>(
         _ request: Request<T>,
-        removeAfterExecution: Bool = false
+        numberOfCalls: Int = 1
     ) -> Self {
         let descriptor = RequestDescriptor(
             url: request.url!,
             result: .failure(StubError.explicitFailure),
-            removeAfterExecution: removeAfterExecution)
+            numberOfCalls: numberOfCalls)
         
         jsonResponses.append(descriptor)
         
@@ -35,10 +35,10 @@ class APIStub {
     
     var jsonResponses: [RequestDescriptor]
     
-    public struct RequestDescriptor: Equatable, Sendable {
+    public class RequestDescriptor: Equatable, @unchecked Sendable {
         let url: URL
         let result: Result<Sendable, any Error>
-        var removeAfterExecution: Bool
+        var numberOfCalls: Int
         
         public static func == (
             lhs: APIStub.RequestDescriptor,

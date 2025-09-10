@@ -7,7 +7,7 @@ class APIStub {
     @discardableResult
     public func success<T: ResponseDTO>(
         _ request: Request<T>, _ response: T,
-        removeAfterExecution: Bool = false
+        numberOfCalls: Int = 1
     ) -> Self {
 
     }
@@ -15,7 +15,7 @@ class APIStub {
     @discardableResult
     public func fail<T: ResponseDTO>(
         _ request: Request<T>,
-        removeAfterExecution: Bool = false
+        numberOfCalls: Int = 1
     ) -> Self {
 
     }

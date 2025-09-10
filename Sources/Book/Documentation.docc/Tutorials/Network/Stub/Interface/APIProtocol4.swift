@@ -7,7 +7,7 @@ class APIStub {
     @discardableResult
     public func success<T: ResponseDTO>(
         _ request: Request<T>, _ response: T,
-        removeAfterExecution: Bool = false
+        numberOfCalls: Int = 1
     ) -> Self {
 
     }
@@ -15,14 +15,14 @@ class APIStub {
     @discardableResult
     public func fail<T: ResponseDTO>(
         _ request: Request<T>,
-        removeAfterExecution: Bool = false
+        numberOfCalls: Int = 1
     ) -> Self {
 
     }
     
     var jsonResponses: [RequestDescriptor]
     
-    public struct RequestDescriptor: Equatable, Sendable {
+    public class RequestDescriptor: Equatable, @unchecked Sendable {
         let url: URL
         let result: Result<Sendable, any Error>
         var removeAfterExecution: Bool

@@ -13,7 +13,9 @@ extension APIStub: APIProtocol {
         }
         
         if let jsonResponse {
-            if jsonResponse.removeAfterExecution {
+            jsonResponse.numberOfCalls -= 1
+            
+            if jsonResponse.numberOfCalls == 0 {
                 let index = jsonResponses.firstIndex(of: jsonResponse)!
                 jsonResponses.remove(at: index)
             }

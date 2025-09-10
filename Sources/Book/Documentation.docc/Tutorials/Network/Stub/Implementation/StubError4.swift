@@ -13,10 +13,11 @@ extension APIStub: APIProtocol {
         }
         
         if let jsonResponse {
+            jsonResponse.numberOfCalls -= 1
             await MainActor.run {
                 calledPaths.append(request.url!)
             }
-            if jsonResponse.removeAfterExecution {
+            if jsonResponse.numberOfCalls == 0 {
                 let index = jsonResponses.firstIndex(of: jsonResponse)!
                 jsonResponses.remove(at: index)
             }
