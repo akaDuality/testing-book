@@ -184,6 +184,8 @@ func hasAuth_whenGot401OnUserRestoration_shouldHidePasscode() async throws {
 ```
 @Comment {
     // TODO: Надо тест попроще
+    
+    добавить про снепшот-тестирование
 }
 
 ### Tutorial
