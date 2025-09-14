@@ -13,8 +13,8 @@
 - <doc:0-2-test-coverage>
 
 ### Свойства тестов и скорость разработки
+- <doc:1-0-TestingIsHard>
 - <doc:1-1-Speed> 
-- <doc:TestingIsHard>
 - <doc:1-2-TestNaming> 
 - <doc:1-4-TestTypes>
 - <doc:1-3-IntegrationFirst>
@@ -26,6 +26,16 @@
 - <doc:TestCases>
 - Как писать стратегии с LLM
 
+### Тестирование экранов и вьюмоделей
+- <doc:3-0-screenshot-testing>
+- <doc:3-1-ui-states
+- <doc:3-2-network>
+- <doc:tutorials/Network>
+- <doc:3-3-preview-prefire>
+
+### Тестирование сценариев
+- <doc:Navigation>
+
 ### Декомпозиция тестов
 - Перед тестом напиши требования на листочек
 - Сценарий написания теста для онбординга
@@ -34,11 +44,8 @@
 - Тесты в разработке: спайк, фейк, тесты
 
 ### Инфраструктура для тестов
-- <doc:Network> 
-- <doc:tutorials/Network>
-- <doc:PreviewPrefire>
-- Вьюмодель как конечное представление. Тестирование состояния через spy. 
-- <doc:Navigation>
+
+
 
 ### Code ambigious
 @Comment {
@@ -65,10 +72,8 @@
 - UI-тесты, когда всего остального не хватило. Сложность написания на уровне юнита должна переборотть
 
 ### Снепшот-тестирование.  
-- <doc:SnapshotTesting>
 - Скриншот-тесты темной темы, Dynamic Type, 
 - Как протестировать озвучку VoiceOver.
-
 
 ### Многомодульность 
 - Скорость билда влияет на тестирование
