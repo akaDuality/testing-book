@@ -28,7 +28,7 @@
 
 ### Тестирование экранов и вьюмоделей
 - <doc:3-0-screenshot-testing>
-- <doc:3-1-ui-states
+- <doc:3-1-ui-states>
 - <doc:3-2-network>
 - <doc:tutorials/Network>
 - <doc:3-3-preview-prefire>
