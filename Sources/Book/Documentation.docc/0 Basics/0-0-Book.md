@@ -34,7 +34,9 @@
 - <doc:3-3-preview-prefire>
 
 ### Тестирование сценариев
-- <doc:Navigation>
+- <doc:4-1-Navigation>
+- <doc:4-2-Real-life-TDD>
+- <doc:4-Monitoring----Tests>
 
 ### Декомпозиция тестов
 - Перед тестом напиши требования на листочек
@@ -68,6 +70,10 @@
     - Тестируем сценарий приложения через навигацию передавая вьюмодели
     - Case Path и Swift Navigaion
 - Снепшот-тесты
+
+- <doc:4-Real-lift-TDD>
+- <doc:4-Monitoring----Tests>
+
 - <doc:ArchitectureTests>
 - UI-тесты, когда всего остального не хватило. Сложность написания на уровне юнита должна переборотть
 
