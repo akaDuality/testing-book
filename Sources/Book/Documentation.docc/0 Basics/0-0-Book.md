@@ -24,6 +24,7 @@
 - <doc:2-2-DSL>
 - <doc:DependenciesBasic>
 - <doc:TestCases>
+- <doc:ObservableFailures>
 - Как писать стратегии с LLM
 
 ### Тестирование экранов и вьюмоделей
@@ -98,4 +99,6 @@
 ### Разное
 - Как контролировать асинхронность (на примере EmailVerificationTests)
 - Как отделять инфраструктуру от теста
+- <doc:UI-testing>
 
+https://www.jamesshore.com/v2/projects/nullables/testing-without-mocks
