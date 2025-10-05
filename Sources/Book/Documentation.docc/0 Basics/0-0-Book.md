@@ -25,6 +25,7 @@
 - <doc:DependenciesBasic>
 - <doc:TestCases>
 - <doc:ObservableFailures>
+- <doc:ParametrizedTests>
 - Как писать стратегии с LLM
 
 ### Тестирование экранов и вьюмоделей
