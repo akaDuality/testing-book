@@ -37,35 +37,35 @@
 
 ```swift
 @Test(.dependencies { deps in
-    deps.api = APIStub.builder()
-        .success(RemittanceAPI.stub_quote(), .testMake(rnpl: .testMake()))
-        .success(RemittanceAPI.stub_submitRemittance(), .testMake())
-        .build()
+deps.api = APIStub.builder()
+.success(RemittanceAPI.stub_quote(), .testMake(rnpl: .testMake()))
+.success(RemittanceAPI.stub_submitRemittance(), .testMake())
+.build()
 })
 func whenEdit_shouldUseNewValue() async throws {
-    try await sut.inputFromAndWaitQuote(200)
-    try await sut.addLoan(10)
-    
-    try await sut.editLoan(40)
-    try await sut.confirm()
+try await sut.inputFromAndWaitQuote(200)
+try await sut.addLoan(10)
 
-    assertInlineSnapshot(of: sut.loadingHistory, as: .dump) {
-        """
-        ▿ 4 elements
-            ▿ RNPLLoadingRequest
-                - amount: 200.0
-                - loanAmount: "null"
-            ▿ RNPLLoadingRequest
-                - amount: 200.0
-                - loanAmount: "10.0"
-            ▿ RNPLLoadingRequest
-                - amount: 200.0
-                - loanAmount: "40.0"
-            ▿ RNPLLoadingRequest
-                - amount: 200.0
-                - loanAmount: "40.0"
-        """
-    }
+try await sut.editLoan(40)
+try await sut.confirm()
+
+assertInlineSnapshot(of: sut.loadingHistory, as: .dump) {
+"""
+▿ 4 elements
+▿ RNPLLoadingRequest
+- amount: 200.0
+- loanAmount: "null"
+▿ RNPLLoadingRequest
+- amount: 200.0
+- loanAmount: "10.0"
+▿ RNPLLoadingRequest
+- amount: 200.0
+- loanAmount: "40.0"
+▿ RNPLLoadingRequest
+- amount: 200.0
+- loanAmount: "40.0"
+"""
+}
 }
 ```
 
@@ -112,7 +112,7 @@ func newBeneficiary_domesticTransactionInGreatBritain_shouldNotShowProvidersSele
 
     let transactionVM = try #require(sut.showTransactionPopover)
     try await transactionVM.process()
-    
+
     #expect(transactionVM.state.is(\.success))
 }
 ```
@@ -131,9 +131,9 @@ func newBeneficiary_domesticTransactionInGreatBritain_shouldNotShowProvidersSele
             .success(RemittanceAPI.stub_quote(), .testMake())
             .build()
     }, operation: {
-    // Создание вьюмодели дополнительно упрощено, потому что там десяток превьюшек 
+        // Создание вьюмодели дополнительно упрощено, потому что там десяток превьюшек 
         makeVMForPreview(amount: 0)
-            .withZeroQuote() 
+        .withZeroQuote() 
     }))
 }
 
@@ -160,5 +160,22 @@ func newBeneficiary_domesticTransactionInGreatBritain_shouldNotShowProvidersSele
 
 ### Запишите тест-кейс, даже если лень писать тест
 
+@Comment {
+    дописать
+}
+
 ### Тест-кейсы могут стать спекой для LLM
 
+@Comment {
+    дописать
+}
+
+### Если нашли баг — запишите тесткейс или тест
+
+Задачка для юного автотестировщика: я нашел баг в поведении программы, но не готов его сейчас чинить. Нужно написать автотест который повторяет это поведение и будет зеленым, чем закрепит поведение?
+
+В целом да, надо написать тест, пусть он проходит и показывает даже неправильное поведение, потому что он отражает то, как ваша программа работает прямо сейчас. При этом прямо в тесте можно написать `// TODO:`, прикрепить ссылку на задачу и т.п. И вот когда руки дойдут до решения проблемы, то тест уже будет, достаточно будет поменять что вы в итоге ожидали и починить код. 
+
+@Comment {
+    Показать 
+}

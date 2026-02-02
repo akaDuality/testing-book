@@ -50,20 +50,18 @@ import API
 import Dependencies
 
 #Preview {
-    let viewModel = withDependencies({ deps in
+    withDependencies({ deps in
         deps.api = APIStub.builder()
             .success(WaitlistAPI.rating(), .testMake())
             .success(WaitlistAPI.weeklyChallenge(), .testMake())
             .success(WaitlistAPI.rewards(), .testMake())
             .build()
-        }, operation: {
-            WaitlistViewModel(
-                inviteCode: "Test invite",
-                startBanking: {},
-                logout: {})
-        }
-
-    WaitlistScreen(viewModel: viewModel)
+    }, operation: {
+        WaitlistScreen(viewModel: WaitlistViewModel(
+            inviteCode: "Test invite",
+            startBanking: {},
+            logout: {}))
+    })
 }
 ```
 
@@ -185,6 +183,7 @@ func hasAuth_whenGot401OnUserRestoration_shouldHidePasscode() async throws {
 }
 ```
 @Comment {
+    Отделить про мокер в отдельную статью
     // TODO: Надо тест попроще
     
     добавить про снепшот-тестирование
@@ -193,3 +192,14 @@ func hasAuth_whenGot401OnUserRestoration_shouldHidePasscode() async throws {
 ### Туториал
 
 <doc:tutorials/Network>
+
+@Comment {
+    https://nshipster.com/replay/
+    https://habr.com/en/amp/publications/970822/
+}
+
+@Comment {
+    подитожить:
+    1. Описываем схему и пишем пример. Для сложных случаев описываем разные варианты
+    2. Используем для превью и тестов
+}

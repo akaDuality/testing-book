@@ -17,11 +17,11 @@
     @Chapter(name: "Зависимости") {
         Самая сложная задача тестирования — получить контроль над всеми зависимостями. 
         
-        1. <doc:DependenciesBasic>
+        1. <doc:2-3-dependencies-basic>
         1. <doc:Network> 
-        1. <doc:PreviewPrefire>
+        1. <doc:3-3-preview-prefire>
         1. Вьюмодель как конечное представление. Тестирование состояния через spy. 
-        1. <doc:Navigation>
+        1. <doc:4-1-Navigation>
 
         @Image(source: Dependencies, alt: "Хмурый мужчина не может запустить тесты из-за сложных зависимостей")   
         

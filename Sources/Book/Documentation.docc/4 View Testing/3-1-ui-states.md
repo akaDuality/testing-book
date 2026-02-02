@@ -315,6 +315,31 @@ class SpyViewModel: ViewModel {
     придумать нормальный пример
 }
 
+@Comment {
+    
+    Создание внутренних объектов можно вынести в функцию чтобы сделать ее перегружаемой
+    
+    class RemittanceCoordinatorSpy: RemittanceCoordinator {
+    
+    var lastRoute: RemittanceRoute?
+    override func navigate(to route: RemittanceRoute) {
+    lastRoute = route
+    }
+    
+    override func createBeneficiaryCoordinator() {
+    showNewBeneficiary = BeneficiaryCoordinatorSpy()
+    }
+    }
+}
+
+@Comment {
+    конструкторы с альтернативными реализациями
+    
+    public convenience init() {
+    self.init(beneficiaryCoordinator: BeneficiaryCoordinator())
+    }
+}
+
 
 ### Архитектурные тесты
 

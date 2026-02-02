@@ -9,8 +9,13 @@
 ## Topics
 
 ### Особенности мобильных тестов
-- <doc:0-1-mobile-testing-pyramid>
-- <doc:0-2-test-coverage>
+- <doc:0-1-app-scaling>
+- <doc:0-2-mobile-testing-pyramid>
+- <doc:0-3-test-coverage>
+
+@Comment {
+    Подвинуть 0-3 в начало
+}
 
 ### Свойства тестов и скорость разработки
 - <doc:1-0-TestingIsHard>
@@ -21,24 +26,31 @@
 
 ### Пишем первые тесты 
 - <doc:2-1-TDD-Kata>
+- <doc:tutorials/BowlingKata>
 - <doc:2-2-DSL>
-- <doc:DependenciesBasic>
-- <doc:TestCases>
-- <doc:ObservableFailures>
-- <doc:ParametrizedTests>
+- <doc:2-3-dependencies-basic>
+- <doc:2-4-linear-execution>
+- <doc:2-5-observable-failures>
+- <doc:2-6-parameterized-tests>
+
+### Тестирование вьюмоделей
+- <doc:3-1-test-cases>
+- <doc:3-2-network>
+- <doc:tutorials/Network>
+- <doc:SnapshotTesting>
 - Как писать стратегии с LLM
 
 ### Тестирование экранов и вьюмоделей
 - <doc:3-0-screenshot-testing>
 - <doc:3-1-ui-states>
-- <doc:3-2-network>
+
 - <doc:tutorials/Network>
 - <doc:3-3-preview-prefire>
 
 ### Тестирование сценариев
 - <doc:4-1-Navigation>
-- <doc:4-2-Real-life-TDD>
-- <doc:4-Monitoring----Tests>
+- <doc:4-3-Real-life-TDD>
+- <doc:4-Monitoring-Tests>
 
 ### Декомпозиция тестов
 - Перед тестом напиши требования на листочек
@@ -73,8 +85,8 @@
     - Case Path и Swift Navigaion
 - Снепшот-тесты
 
-- <doc:4-Real-lift-TDD>
-- <doc:4-Monitoring----Tests>
+- <doc:4-3-Real-life-TDD>
+- <doc:4-Monitoring-Tests>
 
 - <doc:ArchitectureTests>
 - UI-тесты, когда всего остального не хватило. Сложность написания на уровне юнита должна переборотть
