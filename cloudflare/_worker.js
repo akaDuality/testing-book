@@ -225,7 +225,7 @@ function loginPage(paymentLink, error, returnTo) {
 // --- SPA auth script ---
 // Injected into HTML pages so that client-side navigation to paid
 // articles triggers a full page reload (which shows the login form).
-const AUTH_SCRIPT = `<script>(function(){var f=window.fetch;window.fetch=function(){return f.apply(this,arguments).then(function(r){if(r.status===401){window.location.reload()}return r})}})();</script>`;
+const AUTH_SCRIPT = `<script>(function(){var f=window.fetch;window.fetch=function(){return f.apply(this,arguments).then(function(r){if(r.status===401){window.location.reload();return new Promise(function(){})}return r})}})();</script>`;
 
 async function injectAuthScript(response) {
   const contentType = response.headers.get('content-type') || '';
