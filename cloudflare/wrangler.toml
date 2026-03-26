@@ -3,5 +3,8 @@ main = "router-worker.js"
 compatibility_date = "2024-01-01"
 
 routes = [
-  { pattern = "rubanov.dev/testing-book/*", zone_name = "rubanov.dev" }
+  { pattern = "rubanov.dev/testing-book/*", zone_name = "rubanov.dev" },
+  { pattern = "rubanov.dev/documentation/*", zone_name = "rubanov.dev" },
+  { pattern = "rubanov.dev/tutorials/*", zone_name = "rubanov.dev" },
+  { pattern = "rubanov.dev/data/*", zone_name = "rubanov.dev" }
 ]
