@@ -221,6 +221,22 @@ function loginPage(paymentLink, error, returnTo) {
 </html>`;
 }
 
+// --- SPA auth script ---
+// Injected into HTML pages so that client-side navigation to paid
+// articles triggers a full page reload (which shows the login form).
+const AUTH_SCRIPT = `<script>(function(){var f=window.fetch;window.fetch=function(){return f.apply(this,arguments).then(function(r){if(r.status===401){window.location.reload()}return r})}})();</script>`;
+
+async function injectAuthScript(response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) return response;
+  const html = await response.text();
+  const modified = html.replace('</head>', AUTH_SCRIPT + '</head>');
+  return new Response(modified, {
+    status: response.status,
+    headers: response.headers,
+  });
+}
+
 // --- Main Worker ---
 
 export default {
@@ -277,7 +293,8 @@ export default {
 
     // --- Free content (no auth required) ---
     if (isFreePath(url.pathname)) {
-      return env.ASSETS.fetch(request);
+      const response = await env.ASSETS.fetch(request);
+      return injectAuthScript(response);
     }
 
     // --- Protected content ---
@@ -290,7 +307,17 @@ export default {
       return env.ASSETS.fetch(request);
     }
 
-    // Not authenticated — show login page
+    // Not authenticated
+    // JSON data requests (SPA fetching article content) — return 401 JSON
+    // so the injected script can catch it and reload the page
+    if (url.pathname.endsWith('.json')) {
+      return new Response('{"error":"unauthorized"}', {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // HTML page requests — show login form
     const returnTo = url.pathname + url.search;
     return new Response(loginPage(env.STRIPE_PAYMENT_LINK || '#', null, returnTo), {
       status: 401, headers: { 'Content-Type': 'text/html;charset=UTF-8' },
