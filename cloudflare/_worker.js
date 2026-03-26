@@ -9,6 +9,13 @@
 const COOKIE_NAME = 'patreon_session';
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
+// --- Free content configuration ---
+// Article slugs starting with these prefixes are accessible without subscription.
+// Prefix maps to folder/file naming: "0-" = "0 Basics", "1-" = "7 Properties".
+const FREE_SECTIONS = ['0-', '1-'];
+// Individual article slugs to make free regardless of prefix.
+const FREE_ARTICLES = [];
+
 // --- Crypto helpers ---
 
 async function hmacSign(data, secret) {
@@ -162,6 +169,42 @@ function accessDeniedPage(patreonPageName) {
 </html>`;
 }
 
+// --- Free path resolution ---
+
+function isFreeArticleSlug(slug) {
+  const lower = slug.toLowerCase();
+  if (FREE_ARTICLES.some(a => a.toLowerCase() === lower)) return true;
+  return FREE_SECTIONS.some(prefix => lower.startsWith(prefix.toLowerCase()));
+}
+
+function isFreePath(pathname) {
+  const path = pathname.toLowerCase();
+
+  // Static assets (css, js, images, fonts) — always free
+  if (!path.startsWith('/documentation/') && !path.startsWith('/data/documentation/') &&
+      !path.startsWith('/tutorials/') && !path.startsWith('/data/tutorials/')) {
+    return true;
+  }
+
+  // Root documentation page (table of contents) — always free
+  if (path === '/documentation/book' || path === '/documentation/book/') {
+    return true;
+  }
+  if (path === '/data/documentation/book.json') {
+    return true;
+  }
+
+  // Article HTML: /documentation/book/<slug> or /documentation/book/<slug>/
+  const htmlMatch = path.match(/^\/documentation\/book\/([^/.]+)\/?$/);
+  if (htmlMatch) return isFreeArticleSlug(htmlMatch[1]);
+
+  // Article JSON data: /data/documentation/book/<slug>.json
+  const jsonMatch = path.match(/^\/data\/documentation\/book\/([^/.]+)\.json$/);
+  if (jsonMatch) return isFreeArticleSlug(jsonMatch[1]);
+
+  return false;
+}
+
 // --- Main Worker ---
 
 export default {
@@ -220,6 +263,11 @@ export default {
           'Set-Cookie': setCookieHeader('', 0),
         },
       });
+    }
+
+    // --- Free content (no auth required) ---
+    if (isFreePath(url.pathname)) {
+      return env.ASSETS.fetch(request);
     }
 
     // --- Protected content ---
