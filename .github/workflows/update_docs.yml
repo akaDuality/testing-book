@@ -50,6 +50,14 @@ jobs:
       - name: Add Cloudflare Worker
         run: cp cloudflare/_worker.js ${{ env.DERIVED_DATA_PATH }}/_worker.js
 
+      - name: Create Cloudflare Pages project (if needed)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create testing-book --production-branch main
+        continue-on-error: true
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
