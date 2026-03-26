@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -19,7 +17,6 @@ env:
   SCHEME: "Book"
   DERIVED_DATA_PATH: './docs'
   DESTINATION: 'platform=iOS Simulator,name=iPhone 15'
-  REPOSITORY_NAME: 'testing-book'
 
 jobs:
   update-docs:
@@ -31,13 +28,10 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        
+
       - name: Build
         run: |
-          swift package --allow-writing-to-directory ${{ env.DERIVED_DATA_PATH }} generate-documentation --target ${{ env.SCHEME }} --disable-indexing --transform-for-static-hosting --hosting-base-path '${{ env.REPOSITORY_NAME }}' --output-path ${{ env.DERIVED_DATA_PATH }}
+          swift package --allow-writing-to-directory ${{ env.DERIVED_DATA_PATH }} generate-documentation --target ${{ env.SCHEME }} --disable-indexing --transform-for-static-hosting --output-path ${{ env.DERIVED_DATA_PATH }}
 
       - name: Add redirect index.html
         run: |
@@ -53,12 +47,12 @@ jobs:
           </html>
           EOF
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ${{ env.DERIVED_DATA_PATH }}
+      - name: Add Cloudflare Worker
+        run: cp cloudflare/_worker.js ${{ env.DERIVED_DATA_PATH }}/_worker.js
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-      
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ${{ env.DERIVED_DATA_PATH }} --project-name=testing-book
