@@ -1,0 +1,7 @@
+name = "rubanov-dev-router"
+main = "router-worker.js"
+compatibility_date = "2024-01-01"
+
+routes = [
+  { pattern = "rubanov.dev/testing-book/*", zone_name = "rubanov.dev" }
+]
