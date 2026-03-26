@@ -39,10 +39,10 @@ jobs:
           <!DOCTYPE html>
           <html>
             <head>
-              <meta http-equiv="refresh" content="0; url=./testing-book/documentation/book/">
+              <meta http-equiv="refresh" content="0; url=./documentation/book/">
             </head>
             <body>
-              <p>Redirecting to <a href="./testing-book/documentation/book/">documentation</a>...</p>
+              <p>Redirecting to <a href="./documentation/book/">documentation</a>...</p>
             </body>
           </html>
           EOF
