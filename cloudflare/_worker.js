@@ -13,6 +13,11 @@ const FREE_SECTIONS = ['0-', '1-'];
 // Individual article slugs to make free regardless of prefix.
 const FREE_ARTICLES = [];
 
+// Browser-facing base path (must match --hosting-base-path).
+// Used only for links in generated HTML and cookie scope.
+// Route matching uses root paths since the router strips this prefix.
+const BASE = '/testing-book';
+
 // --- Crypto helpers ---
 
 async function hmacSign(data, secret) {
@@ -66,7 +71,7 @@ function getCookie(request, name) {
 }
 
 function setCookieHeader(value, maxAge) {
-  return `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+  return `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=${BASE}; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 }
 
 // --- Stripe API ---
@@ -203,7 +208,7 @@ function loginPage(paymentLink, error, returnTo) {
     <h1>Paid Chapter</h1>
     <p class="subtitle">Already purchased? Enter the email you used at checkout.</p>
     ${errorHtml}
-    <form method="POST" action="/auth/verify">
+    <form method="POST" action="${BASE}/auth/verify">
       <input type="hidden" name="return_to" value="${returnTo}">
       <label for="email">Email</label>
       <input type="email" id="email" name="email" placeholder="you@example.com" required>
@@ -211,7 +216,7 @@ function loginPage(paymentLink, error, returnTo) {
     </form>
     <div class="divider">or</div>
     <a href="${paymentLink}" class="btn btn-buy">Buy the Book</a>
-    <span class="back"><a href="/documentation/book">&#8592; Free chapters</a></span>
+    <span class="back"><a href="${BASE}/documentation/book">&#8592; Free chapters</a></span>
   </div>
 </body>
 </html>`;
@@ -281,7 +286,7 @@ export default {
       return new Response(null, {
         status: 302,
         headers: {
-          Location: '/documentation/book',
+          Location: `${BASE}/documentation/book`,
           'Set-Cookie': setCookieHeader('', 0),
         },
       });
