@@ -13,6 +13,9 @@ const FREE_SECTIONS = ['0-', '1-'];
 // Individual article slugs to make free regardless of prefix.
 const FREE_ARTICLES = [];
 
+// Base path where the book is hosted (must match --hosting-base-path).
+const BASE = '/testing-book';
+
 // --- Crypto helpers ---
 
 async function hmacSign(data, secret) {
@@ -66,7 +69,7 @@ function getCookie(request, name) {
 }
 
 function setCookieHeader(value, maxAge) {
-  return `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+  return `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=${BASE}; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 }
 
 // --- Stripe API ---
@@ -108,27 +111,28 @@ function isFreeArticleSlug(slug) {
 
 function isFreePath(pathname) {
   const path = pathname.toLowerCase();
+  const base = BASE.toLowerCase();
 
   // Static assets (css, js, images, fonts) — always free
-  if (!path.startsWith('/documentation/') && !path.startsWith('/data/documentation/') &&
-      !path.startsWith('/tutorials/') && !path.startsWith('/data/tutorials/')) {
+  if (!path.startsWith(`${base}/documentation/`) && !path.startsWith(`${base}/data/documentation/`) &&
+      !path.startsWith(`${base}/tutorials/`) && !path.startsWith(`${base}/data/tutorials/`)) {
     return true;
   }
 
   // Root documentation page (table of contents) — always free
-  if (path === '/documentation/book' || path === '/documentation/book/') {
+  if (path === `${base}/documentation/book` || path === `${base}/documentation/book/`) {
     return true;
   }
-  if (path === '/data/documentation/book.json') {
+  if (path === `${base}/data/documentation/book.json`) {
     return true;
   }
 
-  // Article HTML: /documentation/book/<slug> or /documentation/book/<slug>/
-  const htmlMatch = path.match(/^\/documentation\/book\/([^/.]+)\/?$/);
+  // Article HTML: /testing-book/documentation/book/<slug> or .../book/<slug>/
+  const htmlMatch = path.match(new RegExp(`^${base}/documentation/book/([^/.]+)/?$`));
   if (htmlMatch) return isFreeArticleSlug(htmlMatch[1]);
 
-  // Article JSON data: /data/documentation/book/<slug>.json
-  const jsonMatch = path.match(/^\/data\/documentation\/book\/([^/.]+)\.json$/);
+  // Article JSON data: /testing-book/data/documentation/book/<slug>.json
+  const jsonMatch = path.match(new RegExp(`^${base}/data/documentation/book/([^/.]+)\\.json$`));
   if (jsonMatch) return isFreeArticleSlug(jsonMatch[1]);
 
   return false;
@@ -203,7 +207,7 @@ function loginPage(paymentLink, error, returnTo) {
     <h1>Paid Chapter</h1>
     <p class="subtitle">Already purchased? Enter the email you used at checkout.</p>
     ${errorHtml}
-    <form method="POST" action="/auth/verify">
+    <form method="POST" action="${BASE}/auth/verify">
       <input type="hidden" name="return_to" value="${returnTo}">
       <label for="email">Email</label>
       <input type="email" id="email" name="email" placeholder="you@example.com" required>
@@ -211,7 +215,7 @@ function loginPage(paymentLink, error, returnTo) {
     </form>
     <div class="divider">or</div>
     <a href="${paymentLink}" class="btn btn-buy">Buy the Book</a>
-    <span class="back"><a href="/documentation/book">&#8592; Free chapters</a></span>
+    <span class="back"><a href="${BASE}/documentation/book">&#8592; Free chapters</a></span>
   </div>
 </body>
 </html>`;
@@ -224,7 +228,7 @@ export default {
     const url = new URL(request.url);
 
     // --- POST /auth/verify ---
-    if (url.pathname === '/auth/verify' && request.method === 'POST') {
+    if (url.pathname === `${BASE}/auth/verify` && request.method === 'POST') {
       const formData = await request.formData();
       const email = formData.get('email')?.trim().toLowerCase();
       let returnTo = formData.get('return_to') || '/';
@@ -261,11 +265,11 @@ export default {
     }
 
     // --- /auth/logout ---
-    if (url.pathname === '/auth/logout') {
+    if (url.pathname === `${BASE}/auth/logout`) {
       return new Response(null, {
         status: 302,
         headers: {
-          Location: '/',
+          Location: `${BASE}/documentation/book`,
           'Set-Cookie': setCookieHeader('', 0),
         },
       });
