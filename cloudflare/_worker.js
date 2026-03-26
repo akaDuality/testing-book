@@ -1,17 +1,14 @@
-// Patreon OAuth middleware for Cloudflare Pages
+// Stripe-based book access for Cloudflare Pages
 // Environment variables required:
-//   PATREON_CLIENT_ID     - OAuth client ID from Patreon
-//   PATREON_CLIENT_SECRET - OAuth client secret from Patreon
-//   SESSION_SECRET        - Random string for signing session cookies
-//   PATREON_CAMPAIGN_ID   - (optional) Filter to a specific campaign
-//   PATREON_PAGE_NAME     - (optional) Your Patreon page name for the "Become a Patron" link
+//   STRIPE_SECRET_KEY    - Stripe secret API key (sk_live_... or sk_test_...)
+//   STRIPE_PAYMENT_LINK  - Stripe Payment Link URL for buying the book
+//   SESSION_SECRET       - Random string for signing session cookies
 
-const COOKIE_NAME = 'patreon_session';
+const COOKIE_NAME = 'book_session';
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
 // --- Free content configuration ---
-// Article slugs starting with these prefixes are accessible without subscription.
-// Prefix maps to folder/file naming: "0-" = "0 Basics", "1-" = "7 Properties".
+// Article slugs starting with these prefixes are accessible without purchase.
 const FREE_SECTIONS = ['0-', '1-'];
 // Individual article slugs to make free regardless of prefix.
 const FREE_ARTICLES = [];
@@ -72,101 +69,33 @@ function setCookieHeader(value, maxAge) {
   return `${COOKIE_NAME}=${encodeURIComponent(value)}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
 }
 
-// --- Patreon API ---
+// --- Stripe API ---
 
-function patreonAuthUrl(clientId, redirectUri, returnPath) {
-  const state = returnPath ? btoa(returnPath) : '';
-  const params = new URLSearchParams({
-    response_type: 'code',
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    scope: 'identity identity.memberships',
-    ...(state && { state }),
+async function findCustomerByEmail(email, stripeKey) {
+  const query = encodeURIComponent(`email:"${email}"`);
+  const res = await fetch(`https://api.stripe.com/v1/customers/search?query=${query}`, {
+    headers: { Authorization: `Bearer ${stripeKey}` },
   });
-  return `https://www.patreon.com/oauth2/authorize?${params}`;
+  const data = await res.json();
+  return data.data?.[0] || null;
 }
 
-async function exchangeCode(code, env, redirectUri) {
-  const res = await fetch('https://www.patreon.com/api/oauth2/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      code,
-      grant_type: 'authorization_code',
-      client_id: env.PATREON_CLIENT_ID,
-      client_secret: env.PATREON_CLIENT_SECRET,
-      redirect_uri: redirectUri,
-    }),
-  });
-  return res.json();
-}
+async function hasActiveAccess(customerId, stripeKey) {
+  // Check for active subscriptions
+  const subsRes = await fetch(
+    `https://api.stripe.com/v1/subscriptions?customer=${customerId}&status=active&limit=1`,
+    { headers: { Authorization: `Bearer ${stripeKey}` } },
+  );
+  const subs = await subsRes.json();
+  if (subs.data?.length > 0) return true;
 
-async function fetchIdentity(accessToken) {
-  const url = 'https://www.patreon.com/api/oauth2/v2/identity'
-    + '?include=memberships'
-    + '&fields[member]=patron_status,currently_entitled_amount_cents';
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  return res.json();
-}
-
-function isActivePatron(identity, campaignId) {
-  if (!identity.included) return false;
-  return identity.included.some(item => {
-    if (item.type !== 'member') return false;
-    if (item.attributes?.patron_status !== 'active_patron') return false;
-    if (campaignId) {
-      return item.relationships?.campaign?.data?.id === campaignId;
-    }
-    return true;
-  });
-}
-
-// --- HTML responses ---
-
-function accessDeniedPage(patreonPageName) {
-  const patreonUrl = patreonPageName
-    ? `https://www.patreon.com/${patreonPageName}`
-    : 'https://www.patreon.com';
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patron Access Only</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; background: #f5f5f7; color: #1d1d1f;
-    }
-    .card {
-      text-align: center; max-width: 420px; padding: 48px 32px;
-      background: white; border-radius: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-    .icon { font-size: 48px; margin-bottom: 16px; }
-    h1 { font-size: 24px; font-weight: 600; margin-bottom: 12px; }
-    p { font-size: 16px; color: #6e6e73; line-height: 1.5; margin-bottom: 28px; }
-    .btn {
-      display: inline-block; background: #FF424D; color: white;
-      text-decoration: none; padding: 12px 32px; border-radius: 980px;
-      font-size: 16px; font-weight: 500; transition: background 0.2s;
-    }
-    .btn:hover { background: #e63946; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="icon">&#128218;</div>
-    <h1>Patron Access Only</h1>
-    <p>This book is available exclusively to Patreon supporters. Subscribe to get full access to all chapters.</p>
-    <a class="btn" href="${patreonUrl}">Become a Patron</a>
-  </div>
-</body>
-</html>`;
+  // Check for successful one-time payments
+  const chargesRes = await fetch(
+    `https://api.stripe.com/v1/charges?customer=${customerId}&limit=100`,
+    { headers: { Authorization: `Bearer ${stripeKey}` } },
+  );
+  const charges = await chargesRes.json();
+  return charges.data?.some(c => c.paid && !c.refunded);
 }
 
 // --- Free path resolution ---
@@ -205,46 +134,123 @@ function isFreePath(pathname) {
   return false;
 }
 
+// --- HTML pages ---
+
+function loginPage(paymentLink, error, returnTo) {
+  const errorHtml = error
+    ? `<div class="error">${error}</div>`
+    : '';
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Access</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; background: #f5f5f7; color: #1d1d1f;
+    }
+    .card {
+      width: 100%; max-width: 400px; padding: 48px 32px;
+      background: white; border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+    h1 { font-size: 22px; font-weight: 600; text-align: center; margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: #6e6e73; text-align: center; line-height: 1.4; margin-bottom: 28px; }
+    label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; color: #1d1d1f; }
+    input[type="email"] {
+      width: 100%; padding: 10px 14px; border: 1px solid #d2d2d7;
+      border-radius: 8px; font-size: 16px; outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="email"]:focus { border-color: #0071e3; }
+    .btn {
+      display: block; width: 100%; padding: 12px; border: none;
+      border-radius: 980px; font-size: 16px; font-weight: 500;
+      cursor: pointer; text-align: center; text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: #0071e3; color: white; margin-top: 16px; }
+    .btn-primary:hover { background: #0077ED; }
+    .divider {
+      text-align: center; color: #6e6e73; font-size: 13px;
+      margin: 24px 0; position: relative;
+    }
+    .divider::before, .divider::after {
+      content: ''; position: absolute; top: 50%;
+      width: 40%; height: 1px; background: #d2d2d7;
+    }
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+    .btn-buy { background: #34c759; color: white; }
+    .btn-buy:hover { background: #30b350; }
+    .error {
+      background: #fff2f2; color: #e30000; padding: 10px 14px;
+      border-radius: 8px; font-size: 14px; margin-bottom: 20px;
+      text-align: center;
+    }
+    .back { display: block; text-align: center; margin-top: 20px; font-size: 14px; color: #6e6e73; }
+    .back a { color: #0071e3; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">&#128218;</div>
+    <h1>Paid Chapter</h1>
+    <p class="subtitle">Already purchased? Enter the email you used at checkout.</p>
+    ${errorHtml}
+    <form method="POST" action="/auth/verify">
+      <input type="hidden" name="return_to" value="${returnTo}">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" required>
+      <button type="submit" class="btn btn-primary">Access the Book</button>
+    </form>
+    <div class="divider">or</div>
+    <a href="${paymentLink}" class="btn btn-buy">Buy the Book</a>
+    <span class="back"><a href="/documentation/book">&#8592; Free chapters</a></span>
+  </div>
+</body>
+</html>`;
+}
+
 // --- Main Worker ---
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const redirectUri = `${url.origin}/auth/callback`;
 
-    // --- /auth/callback ---
-    if (url.pathname === '/auth/callback') {
-      const code = url.searchParams.get('code');
-      if (!code) {
-        return new Response(accessDeniedPage(env.PATREON_PAGE_NAME), {
+    // --- POST /auth/verify ---
+    if (url.pathname === '/auth/verify' && request.method === 'POST') {
+      const formData = await request.formData();
+      const email = formData.get('email')?.trim().toLowerCase();
+      let returnTo = formData.get('return_to') || '/';
+      if (!returnTo.startsWith('/')) returnTo = '/';
+
+      if (!email) {
+        return new Response(loginPage(env.STRIPE_PAYMENT_LINK, 'Please enter your email.', returnTo), {
+          status: 400, headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+        });
+      }
+
+      const customer = await findCustomerByEmail(email, env.STRIPE_SECRET_KEY);
+      if (!customer) {
+        return new Response(loginPage(env.STRIPE_PAYMENT_LINK, 'No purchase found for this email.', returnTo), {
           status: 403, headers: { 'Content-Type': 'text/html;charset=UTF-8' },
         });
       }
 
-      const tokenData = await exchangeCode(code, env, redirectUri);
-      if (!tokenData.access_token) {
-        return new Response('Authentication failed. Please try again.', { status: 502 });
-      }
-
-      const identity = await fetchIdentity(tokenData.access_token);
-
-      if (!isActivePatron(identity, env.PATREON_CAMPAIGN_ID)) {
-        return new Response(accessDeniedPage(env.PATREON_PAGE_NAME), {
+      const access = await hasActiveAccess(customer.id, env.STRIPE_SECRET_KEY);
+      if (!access) {
+        return new Response(loginPage(env.STRIPE_PAYMENT_LINK, 'No active purchase found. Your subscription may have expired.', returnTo), {
           status: 403, headers: { 'Content-Type': 'text/html;charset=UTF-8' },
         });
       }
 
-      // Determine return path from OAuth state
-      let returnTo = '/';
-      const state = url.searchParams.get('state');
-      if (state) {
-        try {
-          const decoded = atob(state);
-          if (decoded.startsWith('/')) returnTo = decoded;
-        } catch { /* ignore */ }
-      }
-
-      const sessionValue = await createSession(identity.data.id, env.SESSION_SECRET);
+      const sessionValue = await createSession(customer.id, env.SESSION_SECRET);
       return new Response(null, {
         status: 302,
         headers: {
@@ -280,11 +286,10 @@ export default {
       return env.ASSETS.fetch(request);
     }
 
-    // Not authenticated - redirect to Patreon
-    const returnPath = url.pathname + url.search;
-    return Response.redirect(
-      patreonAuthUrl(env.PATREON_CLIENT_ID, redirectUri, returnPath),
-      302,
-    );
+    // Not authenticated — show login page
+    const returnTo = url.pathname + url.search;
+    return new Response(loginPage(env.STRIPE_PAYMENT_LINK || '#', null, returnTo), {
+      status: 401, headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+    });
   },
 };
