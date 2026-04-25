@@ -1,8 +1,0 @@
-name = "testing-book-router"
-main = "router-worker.js"
-compatibility_date = "2024-01-01"
-
-routes = [
-  { pattern = "bookshelf.dev/testing-book", zone_name = "bookshelf.dev" },
-  { pattern = "bookshelf.dev/testing-book/*", zone_name = "bookshelf.dev" },
-]
