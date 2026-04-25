@@ -2,6 +2,7 @@
 
 @Metadata {
     @TechnologyRoot
+    @DisplayName("Про автотесты на iOS")
 }
 
 > Note: Все интерактивные туторилы в одном месте: <doc:Tutorial-Table-of-Contents>. Но лучше сначала прочитать статьи, они ниже.
